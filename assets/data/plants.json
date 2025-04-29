@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1",
+    "name": "Cactus",
+    "species": "Cactaceae",
+    "imageUrl": "assets/images/cactus1.jpg",
+    "lastWatered": "2024-04-20T10:00:00Z",
+    "wateringFrequency": 14,
+    "lastFertilized": "2024-04-01T10:00:00Z",
+    "fertilizingFrequency": 60,
+    "notes": "Requires minimal water and lots of sunlight"
+  },
+  {
+    "id": "2",
+    "name": "Apple Tree",
+    "species": "Malus domestica",
+    "imageUrl": "assets/images/apple_tree.jpg",
+    "lastWatered": "2024-04-15T10:00:00Z",
+    "wateringFrequency": 7,
+    "lastFertilized": "2024-03-15T10:00:00Z",
+    "fertilizingFrequency": 30,
+    "notes": "Needs regular watering and pruning"
+  },
+  {
+    "id": "3",
+    "name": "Mango Tree",
+    "species": "Mangifera indica",
+    "imageUrl": "assets/images/mango_tree.jpg",
+    "lastWatered": "2024-04-18T10:00:00Z",
+    "wateringFrequency": 5,
+    "lastFertilized": "2024-04-05T10:00:00Z",
+    "fertilizingFrequency": 45,
+    "notes": "Thrives in warm climates"
+  }
+] 
