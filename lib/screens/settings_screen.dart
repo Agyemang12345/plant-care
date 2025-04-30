@@ -5,6 +5,7 @@ import '../services/theme_service.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,11 +19,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   final String _appVersion = '1.0.0';
   bool _isLoading = false;
+  User? _user;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _user = FirebaseAuth.instance.currentUser;
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      setState(() {
+        _user = user;
+      });
+    });
   }
 
   Future<void> _loadSettings() async {
@@ -140,6 +148,125 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _updateEmail() async {
+    final controller = TextEditingController(text: _user?.email ?? '');
+    String? newEmail = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Update Email'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'New Email'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+    if (newEmail != null && newEmail.isNotEmpty && newEmail != _user?.email) {
+      setState(() => _isLoading = true);
+      try {
+        await _user?.updateEmail(newEmail);
+        await _user?.reload();
+        _user = FirebaseAuth.instance.currentUser;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Email updated successfully!'),
+                backgroundColor: Colors.green),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String message = 'Failed to update email.';
+        if (e.code == 'requires-recent-login') {
+          message = 'Please re-authenticate and try again.';
+        } else if (e.code == 'invalid-email') {
+          message = 'Invalid email address.';
+        } else if (e.code == 'email-already-in-use') {
+          message = 'This email is already in use.';
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('An unexpected error occurred')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _updatePassword() async {
+    final controller = TextEditingController();
+    String? newPassword = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Update Password'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'New Password'),
+          obscureText: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+    if (newPassword != null && newPassword.isNotEmpty) {
+      setState(() => _isLoading = true);
+      try {
+        await _user?.updatePassword(newPassword);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Password updated successfully!'),
+                backgroundColor: Colors.green),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String message = 'Failed to update password.';
+        if (e.code == 'weak-password') {
+          message = 'Password is too weak.';
+        } else if (e.code == 'requires-recent-login') {
+          message = 'Please re-authenticate and try again.';
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('An unexpected error occurred')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,6 +280,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // Profile Section
+                Card(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Profile',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Icon(Icons.person, color: Color(0xFF1B4332)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _user?.email ?? 'No email',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1B4332),
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: _updateEmail,
+                              icon:
+                                  const Icon(Icons.email, color: Colors.white),
+                              label: const Text('Change Email'),
+                            ),
+                            const SizedBox(width: 12),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1B4332),
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: _updatePassword,
+                              icon: const Icon(Icons.lock, color: Colors.white),
+                              label: const Text('Change Password'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 const Text(
                   'Preferences',
                   style: TextStyle(
