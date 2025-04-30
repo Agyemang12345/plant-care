@@ -192,10 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (_) => const DiagnoseScreen()));
                     }),
                     _featureCard('Chatbot', Icons.chat, Colors.blue, () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const ChatbotScreen()));
+                      Navigator.pushNamed(context, '/chatbot');
                     }),
                     _featureCard('Community', Icons.people, Colors.purple, () {
                       Navigator.push(

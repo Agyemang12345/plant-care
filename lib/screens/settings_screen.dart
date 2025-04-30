@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/theme_service.dart';
 import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,6 +17,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isDarkMode = false;
   bool _notificationsEnabled = true;
   final String _appVersion = '1.0.0';
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -45,6 +48,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _notificationsEnabled = value;
     });
     await prefs.setBool('notifications', value);
+  }
+
+  Future<void> _handleLogout() async {
+    setState(() => _isLoading = true);
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      await authService.signOut();
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error signing out: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _contactSupport() async {
@@ -120,73 +148,76 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
-      body: ListView(
-        children: [
-          const SizedBox(height: 16),
-          // Appearance Section
-          _buildSectionHeader('Appearance'),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            subtitle: const Text('Enable dark theme'),
-            value: _isDarkMode,
-            onChanged: _toggleDarkMode,
-            secondary: const Icon(Icons.dark_mode),
-          ),
-          const Divider(),
-
-          // Notifications Section
-          _buildSectionHeader('Notifications'),
-          SwitchListTile(
-            title: const Text('Push Notifications'),
-            subtitle: const Text('Get updates about your plants'),
-            value: _notificationsEnabled,
-            onChanged: _toggleNotifications,
-            secondary: const Icon(Icons.notifications),
-          ),
-          const Divider(),
-
-          // Support Section
-          _buildSectionHeader('Support'),
-          ListTile(
-            leading: const Icon(Icons.mail),
-            title: const Text('Contact Support'),
-            subtitle: const Text('Get help with the app'),
-            onTap: _contactSupport,
-          ),
-          ListTile(
-            leading: const Icon(Icons.star),
-            title: const Text('Rate App'),
-            subtitle: const Text('Share your experience'),
-            onTap: _rateApp,
-          ),
-          const Divider(),
-
-          // Legal Section
-          _buildSectionHeader('Legal'),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip),
-            title: const Text('Privacy Policy'),
-            onTap: _showPrivacyPolicy,
-          ),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('About'),
-            subtitle: Text('Version $_appVersion'),
-            onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'PlantCare',
-                applicationVersion: _appVersion,
-                applicationIcon: const Icon(Icons.eco, size: 50),
-                children: const [
-                  Text(
-                      'PlantCare helps you take better care of your plants with smart features and personalized recommendations.'),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const Text(
+                  'Preferences',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Card(
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        title: const Text('Dark Mode'),
+                        subtitle: const Text('Enable dark theme'),
+                        value: _isDarkMode,
+                        onChanged: _toggleDarkMode,
+                      ),
+                      const Divider(),
+                      SwitchListTile(
+                        title: const Text('Notifications'),
+                        subtitle: const Text('Enable push notifications'),
+                        value: _notificationsEnabled,
+                        onChanged: _toggleNotifications,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'About',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: const Text('Version'),
+                        trailing: Text(_appVersion),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        title: const Text('Contact Support'),
+                        trailing: const Icon(Icons.email_outlined),
+                        onTap: _contactSupport,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Card(
+                  child: ListTile(
+                    title: const Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    trailing: const Icon(Icons.logout, color: Colors.red),
+                    onTap: _handleLogout,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 

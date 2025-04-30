@@ -2,11 +2,12 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.example.plant_care_app"
-    compileSdk = 35
+    compileSdk = 34
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -25,7 +26,7 @@ android {
     defaultConfig {
         applicationId = "com.example.plant_care_app"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
@@ -39,4 +40,6 @@ android {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-analytics")
 } 

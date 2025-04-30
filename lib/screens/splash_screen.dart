@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import 'login_screen.dart';
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,9 +31,14 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navigate to login screen after animation completes
+    // Check authentication state and navigate accordingly
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/login');
+      final authService = Provider.of<AuthService>(context, listen: false);
+      if (authService.currentUser != null) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     });
   }
 

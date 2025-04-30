@@ -1,72 +1,81 @@
 import 'package:flutter/material.dart';
-import '../services/gemini_api_service.dart';
-
-class ChatMessage {
-  final String text;
-  final bool isUserMessage;
-
-  ChatMessage({required this.text, required this.isUserMessage});
-}
+import 'package:plant_care_app/services/chatbot_service.dart';
 
 class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({Key? key}) : super(key: key);
+  final String apiKey;
+
+  const ChatbotScreen({Key? key, required this.apiKey}) : super(key: key);
 
   @override
-  State<ChatbotScreen> createState() => _ChatbotScreenState();
+  _ChatbotScreenState createState() => _ChatbotScreenState();
 }
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
-  final TextEditingController _textController = TextEditingController();
-  final List<ChatMessage> _messages = [];
-  final GeminiApiService _apiService = GeminiApiService(
-    apiKey: 'AIzaSyCvultVs5S7HDL1uG6niAwGgIEwgqCpwJE',
-  );
+  late final ChatbotService _chatbotService;
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _addBotMessage(
-        'Hello! I\'m your plant care assistant. How can I help you today?');
+    _chatbotService = ChatbotService(apiKey: widget.apiKey);
   }
 
-  void _addMessage(String text, bool isUserMessage) {
-    setState(() {
-      _messages.add(ChatMessage(text: text, isUserMessage: isUserMessage));
-    });
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
-  void _addBotMessage(String text) {
-    _addMessage(text, false);
-  }
+  Future<void> _sendMessage() async {
+    if (_messageController.text.trim().isEmpty) return;
 
-  Future<void> _handleSubmitted(String text) async {
-    if (text.trim().isEmpty) return;
-
-    _textController.clear();
-    _addMessage(text, true);
+    final message = _messageController.text;
+    _messageController.clear();
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final response = await _apiService.generateContent(text);
-      _addBotMessage(response);
-    } catch (e) {
-      _addBotMessage('Sorry, I encountered an error. Please try again.');
-      print('Error in _handleSubmitted: $e');
-    } finally {
+      final response = await _chatbotService.sendMessage(message);
       setState(() {
         _isLoading = false;
       });
+      _scrollToBottom();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'Dismiss',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
+        ),
+      );
     }
   }
 
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -74,18 +83,47 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plant Care Assistant'),
-        backgroundColor: Colors.green,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () {
+              _chatbotService.clearConversation();
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(8.0),
-              reverse: true,
-              itemCount: _messages.length,
+              itemCount: _chatbotService.conversationHistory.length,
               itemBuilder: (context, index) {
-                final message = _messages[_messages.length - 1 - index];
-                return _buildMessage(message);
+                final message = _chatbotService.conversationHistory[index];
+                final isUser = message['role'] == 'user';
+
+                return Align(
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4.0),
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: isUser
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Text(
+                      message['content']!,
+                      style: TextStyle(
+                        color: isUser ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -94,62 +132,27 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               padding: EdgeInsets.all(8.0),
               child: CircularProgressIndicator(),
             ),
-          _buildMessageComposer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessage(ChatMessage message) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: message.isUserMessage
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        children: [
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: message.isUserMessage
-                    ? Colors.green[100]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                message.text,
-                style: const TextStyle(fontSize: 16.0),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: const InputDecoration(
+                      hintText: 'Type your message...',
+                      border: OutlineInputBorder(),
+                    ),
+                    onSubmitted: (_) => _sendMessage(),
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessageComposer() {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _textController,
-              decoration: const InputDecoration(
-                hintText: 'Ask about plant care...',
-                border: InputBorder.none,
-              ),
-              onSubmitted: _handleSubmitted,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () => _handleSubmitted(_textController.text),
           ),
         ],
       ),

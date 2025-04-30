@@ -49,6 +49,9 @@ dependencies:
   path: ^1.8.3
   flutter_localizations:
     sdk: flutter
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.17.4
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -79,11 +82,7 @@ flutter:
     - assets/images/cactus1.jpg
     - assets/images/apple_tree.jpg
     - assets/images/mango_tree.jpg
-    - assets/data/
     - assets/images/leaf.png
-    - assets/images/avatars/
-    - assets/images/posts/
-    - assets/images/reviews/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
