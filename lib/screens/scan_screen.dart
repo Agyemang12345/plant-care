@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import 'dart:ui';
+import 'package:image_picker/image_picker.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -87,6 +88,29 @@ class _ScanScreenState extends State<ScanScreen>
         setState(() {
           _isProcessing = false;
         });
+      }
+    }
+  }
+
+  Future<void> _onImportFromGallery() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() => _isProcessing = true);
+      try {
+        // Simulate plant identification API call
+        await Future.delayed(const Duration(seconds: 2));
+        String plantName = 'Imported Plant';
+        if (!mounted) return;
+        _showResultDialog(image.path, plantName);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error importing image: $e')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isProcessing = false);
       }
     }
   }
@@ -239,17 +263,10 @@ class _ScanScreenState extends State<ScanScreen>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Tooltip(
-                  message: 'Profile',
+                  message: 'Import from Gallery',
                   child: _BottomIcon(
-                    icon: Icons.person,
-                    onTap: () {},
-                  ),
-                ),
-                Tooltip(
-                  message: 'Favorites',
-                  child: _BottomIcon(
-                    icon: Icons.favorite,
-                    onTap: () {},
+                    icon: Icons.photo_library,
+                    onTap: _isProcessing ? null : _onImportFromGallery,
                   ),
                 ),
                 Tooltip(
