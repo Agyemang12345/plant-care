@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -30,21 +31,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        final authService = Provider.of<AuthService>(context, listen: false);
-        await authService.registerWithEmailAndPassword(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
+        await AuthService().registerWithEmailAndPassword(
+          _emailController.text,
+          _passwordController.text,
         );
         if (mounted) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Registration successful! Please login to continue.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Navigate to login screen
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String message;
+        switch (e.code) {
+          case 'weak-password':
+            message = 'The password provided is too weak.';
+            break;
+          case 'email-already-in-use':
+            message = 'An account already exists for that email.';
+            break;
+          case 'invalid-email':
+            message = 'The email address is invalid.';
+            break;
+          default:
+            message = 'An error occurred during registration.';
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString())),
+            const SnackBar(content: Text('An unexpected error occurred')),
           );
         }
       } finally {
