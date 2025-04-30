@@ -38,8 +38,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    Widget _featureCard(
+        String title, IconData icon, Color color, VoidCallback onTap) {
+      return Material(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        elevation: 2,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          splashColor: color.withOpacity(0.2),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: color.withOpacity(0.15),
+                  child: Icon(icon, color: color, size: 26),
+                  radius: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(title,
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8F7),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -54,23 +87,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Welcome Back!',
-                            style: TextStyle(color: Colors.grey, fontSize: 16)),
-                        SizedBox(height: 2),
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(color: theme.hintColor)),
+                        const SizedBox(height: 2),
                         Text('Plant Lover',
-                            style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1B4332),
-                                letterSpacing: 1)),
+                            style: theme.textTheme.displaySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            )),
                       ],
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0D2F23),
+                        color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -81,13 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       child: Row(
-                        children: const [
+                        children: [
                           Icon(Icons.wb_sunny, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text('PRO',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              )),
                         ],
                       ),
                     ),
@@ -99,15 +134,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1B4332), Color(0xFF23C16B)],
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.secondary
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.green.withOpacity(0.10),
+                      color: theme.colorScheme.primary.withOpacity(0.10),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -119,18 +157,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Care your Plant with',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18)),
-                          const Text('Plant Diagnose',
-                              style: TextStyle(
-                                  color: Color(0xFF5DF28A),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold)),
+                          Text('Care your Plant with',
+                              style: theme.textTheme.bodyLarge
+                                  ?.copyWith(color: Colors.white)),
+                          Text('Plant Diagnose',
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: theme.colorScheme.secondary,
+                                fontWeight: FontWeight.bold,
+                              )),
                           const SizedBox(height: 16),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF23C16B),
+                              backgroundColor: theme.colorScheme.secondary,
                               shape: const StadiumBorder(),
                               elevation: 4,
                             ),
@@ -140,10 +178,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   MaterialPageRoute(
                                       builder: (_) => const DiagnoseScreen()));
                             },
-                            child: const Text('Diagnose Now',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
+                            child: Text('Diagnose Now',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                )),
                           ),
                         ],
                       ),
@@ -152,13 +191,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
-                        'assets/images/leaf.png',
-                        width: 90,
-                        height: 90,
+                        'assets/images/plant_banner.png',
+                        width: 80,
+                        height: 80,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.local_florist,
-                                color: Colors.white, size: 60),
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.local_florist,
+                          color: theme.colorScheme.secondary,
+                          size: 40,
+                        ),
                       ),
                     ),
                   ],
@@ -176,16 +217,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
                   children: [
-                    _featureCard(
-                        'Plant Identifier', Icons.spa, const Color(0xFF23C16B),
-                        () {
+                    _featureCard('Plant Identifier', Icons.spa,
+                        theme.colorScheme.secondary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const ScanScreen()));
                     }),
                     _featureCard('Plant Diagnose', Icons.favorite,
-                        const Color(0xFF5DF28A), () {
+                        theme.colorScheme.secondary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -207,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (_) => const WeatherScreen()));
                     }),
                     _featureCard('Water Calculator', Icons.water_drop,
-                        const Color(0xFF1B4332), () {
+                        theme.colorScheme.primary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -263,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF23C16B),
+                        backgroundColor: theme.colorScheme.secondary,
                         shape: const StadiumBorder(),
                         elevation: 2,
                       ),
@@ -273,8 +313,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(
                                 builder: (_) => const ScanScreen()));
                       },
-                      child: const Text('Identify',
-                          style: TextStyle(color: Colors.white)),
+                      child: Text('Identify',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          )),
                     ),
                   ],
                 ),
@@ -285,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF23C16B),
+        backgroundColor: theme.colorScheme.secondary,
         elevation: 6,
         onPressed: () {
           Navigator.push(
@@ -295,49 +338,18 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: const CircleBorder(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _buildBottomNavBar(),
+      bottomNavigationBar: _buildBottomNavBar(theme),
     );
   }
 
-  Widget _featureCard(
-      String title, IconData icon, Color color, VoidCallback onTap) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 2,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        splashColor: color.withOpacity(0.2),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: color.withOpacity(0.15),
-                child: Icon(icon, color: color, size: 26),
-                radius: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
+  Widget _buildBottomNavBar(ThemeData theme) {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       onTap: (index) {
         if (index == 0) return; // Already on Home
         _onNavTap(index);
       },
-      selectedItemColor: const Color(0xFF1B4332),
+      selectedItemColor: theme.colorScheme.primary,
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
       type: BottomNavigationBarType.fixed,

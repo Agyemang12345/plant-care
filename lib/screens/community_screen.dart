@@ -14,6 +14,14 @@ class _CommunityScreenState extends State<CommunityScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final CommunityService _communityService = CommunityService();
+  final List<String> avatarStickers = [
+    'assets/images/avatars/james.jpg',
+    'assets/images/avatars/lisa.jpg',
+    'assets/images/avatars/michael.jpg',
+    'assets/images/avatars/sarah.jpg',
+    'assets/images/avatars/david.jpg',
+    'assets/images/avatars/emma.jpg',
+  ];
 
   @override
   void initState() {
@@ -80,10 +88,7 @@ class _CommunityScreenState extends State<CommunityScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: AssetImage(post.authorAvatar),
-                  onBackgroundImageError: (e, s) => const Icon(Icons.person),
-                ),
+                leading: _buildAvatar(post.authorAvatar, index),
                 title: Text(post.authorName),
                 subtitle: Text(post.authorExpertise),
                 trailing: Text(
@@ -120,7 +125,6 @@ class _CommunityScreenState extends State<CommunityScreen>
                       .toList(),
                 ),
               ),
-              const Divider(height: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -161,10 +165,7 @@ class _CommunityScreenState extends State<CommunityScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: AssetImage(review.authorAvatar),
-                  onBackgroundImageError: (e, s) => const Icon(Icons.person),
-                ),
+                leading: _buildAvatar(review.authorAvatar, index),
                 title: Text(review.authorName),
                 subtitle: Text(review.authorExpertise),
               ),
@@ -225,59 +226,104 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   Widget _buildPlantLoversTab() {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        childAspectRatio: 0.95,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
       ),
       itemCount: CommunityService.plantLovers.length,
       itemBuilder: (context, index) {
         final lover = CommunityService.plantLovers[index];
         return Card(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: AssetImage(lover['avatar']!),
-                onBackgroundImageError: (e, s) => const Icon(Icons.person),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                lover['name']!,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 36,
+                  backgroundImage: AssetImage(lover['avatar']!),
+                  onBackgroundImageError: (e, s) =>
+                      _buildAvatar(null, index, radius: 36),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                lover['expertise']!,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+                const SizedBox(height: 8),
+                Text(
+                  lover['name']!,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                const SizedBox(height: 2),
+                Text(
+                  lover['expertise']!,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: 80,
+                  height: 32,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: const Text('Follow', style: TextStyle(fontSize: 13)),
                   ),
                 ),
-                child: const Text('Follow'),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildAvatar(String? avatarPath, int index, {double radius = 24}) {
+    final sticker = avatarStickers[index % avatarStickers.length];
+    if (avatarPath == null || avatarPath.isEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.grey[200],
+        child: ClipOval(
+          child: Image.asset(
+            sticker,
+            fit: BoxFit.cover,
+            width: radius * 2,
+            height: radius * 2,
+          ),
+        ),
+      );
+    }
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Colors.grey[200],
+      child: ClipOval(
+        child: Image.asset(
+          avatarPath,
+          fit: BoxFit.cover,
+          width: radius * 2,
+          height: radius * 2,
+          errorBuilder: (context, error, stackTrace) => Image.asset(
+            sticker,
+            fit: BoxFit.cover,
+            width: radius * 2,
+            height: radius * 2,
+          ),
+        ),
+      ),
     );
   }
 }
