@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'dart:io';
 import 'dart:ui';
 import 'package:image_picker/image_picker.dart';
+import '../services/plant_identifier_service.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -20,6 +21,7 @@ class _ScanScreenState extends State<ScanScreen>
   Offset? _focusPoint;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  final PlantIdentifierService _plantIdentifier = PlantIdentifierService();
 
   @override
   void initState() {
@@ -71,16 +73,14 @@ class _ScanScreenState extends State<ScanScreen>
     });
     try {
       final XFile image = await _controller!.takePicture();
-      // Simulate plant identification API call
-      await Future.delayed(const Duration(seconds: 2));
-      // Mock result
-      String plantName = 'Snake Plant';
+      final result = await _plantIdentifier.identifyPlant(File(image.path));
+      final plantInfo = PlantInfo.fromJson(result);
       if (!mounted) return;
-      _showResultDialog(image.path, plantName);
+      _showResultDialog(image.path, plantInfo);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error capturing image: $e')),
+          SnackBar(content: Text('Error identifying plant: $e')),
         );
       }
     } finally {
@@ -98,11 +98,10 @@ class _ScanScreenState extends State<ScanScreen>
     if (image != null) {
       setState(() => _isProcessing = true);
       try {
-        // Simulate plant identification API call
-        await Future.delayed(const Duration(seconds: 2));
-        String plantName = 'Imported Plant';
+        final result = await _plantIdentifier.identifyPlant(File(image.path));
+        final plantInfo = PlantInfo.fromJson(result);
         if (!mounted) return;
-        _showResultDialog(image.path, plantName);
+        _showResultDialog(image.path, plantInfo);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -115,13 +114,14 @@ class _ScanScreenState extends State<ScanScreen>
     }
   }
 
-  void _showResultDialog(String imagePath, String plantName) {
+  void _showResultDialog(String imagePath, PlantInfo plantInfo) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Plant Identified'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.file(
               File(imagePath),
@@ -131,16 +131,24 @@ class _ScanScreenState extends State<ScanScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              plantName,
+              plantInfo.commonName,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            Text(
+              plantInfo.scientificName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontStyle: FontStyle.italic,
+                color: Colors.green,
+              ),
+            ),
             const SizedBox(height: 8),
-            const Text(
-              'This is your plant! Learn more about its care.',
-              style: TextStyle(
+            Text(
+              plantInfo.description,
+              style: const TextStyle(
                 color: Colors.grey,
               ),
             ),
@@ -150,13 +158,6 @@ class _ScanScreenState extends State<ScanScreen>
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Navigate to plant details if needed
-            },
-            child: const Text('View Details'),
           ),
         ],
       ),
