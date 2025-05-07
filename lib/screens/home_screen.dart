@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ?.copyWith(color: Colors.white)),
                           Text('Plant Diagnose',
                               style: theme.textTheme.displaySmall?.copyWith(
-                                color: theme.colorScheme.secondary,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               )),
                           const SizedBox(height: 16),
@@ -178,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   MaterialPageRoute(
                                       builder: (_) => const DiagnoseScreen()));
                             },
-                            child: Text('Diagnose Now',
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                            child: const Text('Diagnose Now',
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 )),
@@ -252,11 +252,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (_) => const WaterCalculatorScreen()));
-                    }),
-                    _featureCard('Light Meter', Icons.wb_sunny, Colors.amber,
-                        () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Light Meter coming soon!')));
                     }),
                   ],
                 ),

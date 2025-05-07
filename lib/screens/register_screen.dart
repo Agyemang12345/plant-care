@@ -31,7 +31,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        await AuthService().registerWithEmailAndPassword(
+        final authService = Provider.of<AuthService>(context, listen: false);
+        await authService.registerWithEmailAndPassword(
           _emailController.text,
           _passwordController.text,
         );
