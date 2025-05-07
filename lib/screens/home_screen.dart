@@ -6,6 +6,7 @@ import 'chatbot_screen.dart';
 import 'water_calculator_screen.dart';
 import 'community_screen.dart';
 import 'weather_screen.dart';
+import 'tip_page.dart';
 // import 'settings_screen.dart'; // Uncomment if you have a settings screen
 
 class HomeScreen extends StatefulWidget {
@@ -252,6 +253,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (_) => const WaterCalculatorScreen()));
+                    }),
+                    _featureCard('Tip', Icons.lightbulb, Colors.teal, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TipPage()),
+                      );
                     }),
                   ],
                 ),

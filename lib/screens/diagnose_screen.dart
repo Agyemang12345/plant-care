@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:ui';
+import 'tip_page.dart';
 
 class DiagnoseScreen extends StatefulWidget {
   const DiagnoseScreen({super.key});
@@ -355,6 +356,17 @@ class _DiagnoseScreenState extends State<DiagnoseScreen>
               : 'Your plant is healthy. Keep it up.',
         ),
         actions: [
+          if (hasHoleOnLeaves)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TipPage()),
+                );
+              },
+              child: const Text('Tip'),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
