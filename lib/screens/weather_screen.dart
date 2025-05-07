@@ -138,6 +138,18 @@ class _WeatherScreenState extends State<WeatherScreen> {
             ),
           ),
           const SizedBox(height: 8),
+          if (recommendations.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                recommendations.map((rec) => rec['name']).join(', '),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.green,
+                ),
+              ),
+            ),
           ...recommendations.map((rec) => _buildRecommendationCard(rec)),
         ],
       ),

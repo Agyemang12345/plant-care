@@ -76,12 +76,15 @@ class _ScanScreenState extends State<ScanScreen>
       final result = await _plantIdentifier.identifyPlant(File(image.path));
       final plantInfo = PlantInfo.fromJson(result);
       if (!mounted) return;
-      _showResultDialog(image.path, plantInfo);
+      if (plantInfo.commonName == 'Unknown' ||
+          plantInfo.scientificName == 'Unknown') {
+        _showDefaultResultDialog();
+      } else {
+        _showResultDialog(image.path, plantInfo);
+      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error identifying plant: $e')),
-        );
+        _showDefaultResultDialog();
       }
     } finally {
       if (mounted) {
@@ -154,6 +157,23 @@ class _ScanScreenState extends State<ScanScreen>
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDefaultResultDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Plant Not Identified'),
+        content: const Text(
+            'Sorry, we couldn\'t identify this plant. Please try again with a clearer photo or a different angle.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

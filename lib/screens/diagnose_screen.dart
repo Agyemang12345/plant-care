@@ -72,18 +72,14 @@ class _DiagnoseScreenState extends State<DiagnoseScreen>
     });
     try {
       final XFile image = await _controller!.takePicture();
-      // Simulate plant recognition process
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted) return;
-
-      // Simulate plant recognition result
-      final Map<String, String> plantInfo = _getRandomPlantInfo();
-      _showPlantInfoDialog(plantInfo);
+      // Simulate plant recognition result with a random hasHoleOnLeaves
+      final bool hasHoleOnLeaves = DateTime.now().second % 2 == 0; // Simulate
+      _showCustomDiagnosisDialog(hasHoleOnLeaves);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error diagnosing plant: $e')),
-        );
+        _showCustomDiagnosisDialog(true); // Default to unhealthy on error
       }
     } finally {
       if (mounted) {
@@ -346,6 +342,26 @@ class _DiagnoseScreenState extends State<DiagnoseScreen>
     setState(() {
       _focusPoint = null;
     });
+  }
+
+  void _showCustomDiagnosisDialog(bool hasHoleOnLeaves) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Diagnosis Result'),
+        content: Text(
+          hasHoleOnLeaves
+              ? 'Your plant is not healthy. Get more tips.'
+              : 'Your plant is healthy. Keep it up.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
