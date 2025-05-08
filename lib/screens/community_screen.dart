@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/community_post.dart';
 import '../services/community_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'plant_lover_profile.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({Key? key}) : super(key: key);
@@ -64,9 +65,9 @@ class _CommunityScreenState extends State<CommunityScreen>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Implement post creation
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Coming soon: Create a post')),
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CreatePostPage()),
           );
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -225,66 +226,106 @@ class _CommunityScreenState extends State<CommunityScreen>
   }
 
   Widget _buildPlantLoversTab() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.95,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: CommunityService.plantLovers.length,
+    final plantLovers = [
+      {
+        'name': 'James Green',
+        'expertise': 'Indoor Plants Expert',
+        'achievements': [
+          'Grew a 10-foot Monstera Deliciosa',
+          'Successfully propagated over 50 plants',
+          'Won "Best Indoor Garden" Award 2023',
+          'Created an indoor jungle with 100+ plants',
+          'Featured in Home & Garden Magazine',
+        ],
+      },
+      {
+        'name': 'Sarah Chen',
+        'expertise': 'Succulent Specialist',
+        'achievements': [
+          'Maintained a collection of 100+ rare succulents',
+          'Published "The Ultimate Succulent Care Guide"',
+          'Hosted 20+ succulent propagation workshops',
+          'Created a drought-resistant garden design',
+          'Won "Best Succulent Display" at Garden Show 2023',
+        ],
+      },
+      {
+        'name': 'Michael Rodriguez',
+        'expertise': 'Garden Design Expert',
+        'achievements': [
+          'Designed 25+ community gardens',
+          'Grew award-winning roses for 5 consecutive years',
+          'Lead botanist at City Botanical Gardens',
+          'Published "Modern Garden Design" book',
+          'Featured on Garden & Home TV Show',
+        ],
+      },
+      {
+        'name': 'Emma Thompson',
+        'expertise': 'Flower Expert',
+        'achievements': [
+          'Created butterfly gardens in 10 schools',
+          'Won "Best Flower Arrangement" 3 years running',
+          'Conducted 50+ flower care seminars',
+          'Developed new hybrid rose variety',
+          'Judge at National Flower Show',
+        ],
+      },
+      {
+        'name': 'David Lee',
+        'expertise': 'Herb Master',
+        'achievements': [
+          'Cultivated 50+ varieties of rare herbs',
+          'Published "Cooking with Home-Grown Herbs"',
+          'Created healing herb garden program',
+          'Supplied herbs to top restaurants',
+          'Won "Best Herb Garden" award 2023',
+        ],
+      },
+      {
+        'name': 'Lisa Martinez',
+        'expertise': 'Urban Farming Expert',
+        'achievements': [
+          'Created 15 urban farming projects',
+          'Led 100+ gardening workshops',
+          'Transformed 5 acres into community gardens',
+          'Started "Green City" initiative',
+          'Featured in "Urban Farming Today" magazine',
+        ],
+      },
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: plantLovers.length,
       itemBuilder: (context, index) {
-        final lover = CommunityService.plantLovers[index];
+        final lover = plantLovers[index];
         return Card(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 36,
-                  backgroundImage: AssetImage(lover['avatar']!),
-                  onBackgroundImageError: (e, s) =>
-                      _buildAvatar(null, index, radius: 36),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  lover['name']!,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  lover['expertise']!,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 80,
-                  height: 32,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Text('Follow', style: TextStyle(fontSize: 13)),
-                  ),
-                ),
-              ],
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Text(
+                (lover['name'] as String).substring(0, 1),
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
+            title: Text(lover['name'] as String),
+            subtitle: Text(lover['expertise'] as String),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PlantLoverProfile(
+                    name: lover['name'] as String,
+                    expertise: lover['expertise'] as String,
+                    achievements:
+                        List<String>.from(lover['achievements'] as List),
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
@@ -322,6 +363,54 @@ class _CommunityScreenState extends State<CommunityScreen>
             width: radius * 2,
             height: radius * 2,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class CreatePostPage extends StatelessWidget {
+  const CreatePostPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Post'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Content',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 5,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Implement post creation logic
+                Navigator.pop(context);
+              },
+              child: const Text('Post'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
