@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TipPage extends StatelessWidget {
-  const TipPage({Key? key}) : super(key: key);
+  const TipPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'dart:ui';
 import 'tip_page.dart';
 
 class DiagnoseScreen extends StatefulWidget {

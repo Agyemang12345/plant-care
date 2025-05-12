@@ -6,11 +6,11 @@ class PlantLoverProfile extends StatelessWidget {
   final List<String> achievements;
 
   const PlantLoverProfile({
-    Key? key,
+    super.key,
     required this.name,
     required this.expertise,
     required this.achievements,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -298,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Icon(Icons.person, color: Color(0xFF1B4332)),
+                            const Icon(Icons.person, color: Color(0xFF1B4332)),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(

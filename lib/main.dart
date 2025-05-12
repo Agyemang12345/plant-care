@@ -13,8 +13,9 @@ import 'screens/splash_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/chatbot_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

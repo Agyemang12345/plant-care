@@ -287,7 +287,7 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
                   // Reminders Tab
                   _buildRemindersTab(),
                   // History Tab
-                  Center(child: Text('History will appear here')),
+                  const Center(child: Text('History will appear here')),
                 ],
               ),
             ),

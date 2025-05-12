@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Widget _featureCard(
+    Widget featureCard(
         String title, IconData icon, Color color, VoidCallback onTap) {
       return Material(
         color: theme.cardColor,
@@ -56,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 CircleAvatar(
                   backgroundColor: color.withOpacity(0.15),
-                  child: Icon(icon, color: color, size: 26),
                   radius: 20,
+                  child: Icon(icon, color: color, size: 26),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.wb_sunny, color: Colors.white, size: 20),
+                          const Icon(Icons.wb_sunny, color: Colors.white, size: 20),
                           const SizedBox(width: 8),
                           Text('PRO',
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -218,43 +218,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
                   children: [
-                    _featureCard('Plant Identifier', Icons.spa,
+                    featureCard('Plant Identifier', Icons.spa,
                         theme.colorScheme.secondary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const ScanScreen()));
                     }),
-                    _featureCard('Plant Diagnose', Icons.favorite,
+                    featureCard('Plant Diagnose', Icons.favorite,
                         theme.colorScheme.secondary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const DiagnoseScreen()));
                     }),
-                    _featureCard('Chatbot', Icons.chat, Colors.blue, () {
+                    featureCard('Chatbot', Icons.chat, Colors.blue, () {
                       Navigator.pushNamed(context, '/chatbot');
                     }),
-                    _featureCard('Community', Icons.people, Colors.purple, () {
+                    featureCard('Community', Icons.people, Colors.purple, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const CommunityScreen()));
                     }),
-                    _featureCard('Weather', Icons.wb_sunny, Colors.orange, () {
+                    featureCard('Weather', Icons.wb_sunny, Colors.orange, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const WeatherScreen()));
                     }),
-                    _featureCard('Water Calculator', Icons.water_drop,
+                    featureCard('Water Calculator', Icons.water_drop,
                         theme.colorScheme.primary, () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => const WaterCalculatorScreen()));
                     }),
-                    _featureCard('Tip', Icons.lightbulb, Colors.teal, () {
+                    featureCard('Tip', Icons.lightbulb, Colors.teal, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const TipPage()),
@@ -290,10 +290,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 40),
                     ),
                     const SizedBox(width: 16),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text('No plants yet',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16)),
@@ -336,8 +336,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => const ScanScreen()));
         },
-        child: const Icon(Icons.qr_code_scanner, size: 32, color: Colors.white),
         shape: const CircleBorder(),
+        child: const Icon(Icons.qr_code_scanner, size: 32, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomNavBar(theme),

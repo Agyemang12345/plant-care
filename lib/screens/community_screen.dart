@@ -5,7 +5,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'plant_lover_profile.dart';
 
 class CommunityScreen extends StatefulWidget {
-  const CommunityScreen({Key? key}) : super(key: key);
+  const CommunityScreen({super.key});
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
@@ -370,7 +370,7 @@ class _CommunityScreenState extends State<CommunityScreen>
 }
 
 class CreatePostPage extends StatelessWidget {
-  const CreatePostPage({Key? key}) : super(key: key);
+  const CreatePostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -384,15 +384,15 @@ class CreatePostPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Title',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
+            const TextField(
+              decoration: InputDecoration(
                 labelText: 'Content',
                 border: OutlineInputBorder(),
               ),
@@ -404,11 +404,11 @@ class CreatePostPage extends StatelessWidget {
                 // TODO: Implement post creation logic
                 Navigator.pop(context);
               },
-              child: const Text('Post'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
               ),
+              child: const Text('Post'),
             ),
           ],
         ),

@@ -4,7 +4,7 @@ import 'package:plant_care_app/services/chatbot_service.dart';
 class ChatbotScreen extends StatefulWidget {
   final String apiKey;
 
-  const ChatbotScreen({Key? key, required this.apiKey}) : super(key: key);
+  const ChatbotScreen({super.key, required this.apiKey});
 
   @override
   _ChatbotScreenState createState() => _ChatbotScreenState();

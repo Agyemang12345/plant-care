@@ -3,7 +3,7 @@ import '../services/water_calculator_service.dart';
 import 'package:intl/intl.dart';
 
 class WaterCalculatorScreen extends StatefulWidget {
-  const WaterCalculatorScreen({Key? key}) : super(key: key);
+  const WaterCalculatorScreen({super.key});
 
   @override
   State<WaterCalculatorScreen> createState() => _WaterCalculatorScreenState();
