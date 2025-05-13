@@ -7,6 +7,7 @@ import 'water_calculator_screen.dart';
 import 'community_screen.dart';
 import 'weather_screen.dart';
 import 'tip_page.dart';
+import 'plant_identification_screen.dart';
 // import 'settings_screen.dart'; // Uncomment if you have a settings screen
 
 class HomeScreen extends StatefulWidget {
@@ -117,7 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.wb_sunny, color: Colors.white, size: 20),
+                          const Icon(Icons.wb_sunny,
+                              color: Colors.white, size: 20),
                           const SizedBox(width: 8),
                           Text('PRO',
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -206,18 +208,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              // Feature Grid
+              // Feature Cards
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 2.5,
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
+                padding: const EdgeInsets.all(16),
+                child: Column(
                   children: [
+                    featureCard(
+                      'Plant Identification',
+                      Icons.camera_alt,
+                      Colors.green,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PlantIdentificationScreen(
+                              apiKey:
+                                  'YOUR_API_KEY', // Replace with your actual API key
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
                     featureCard('Plant Identifier', Icons.spa,
                         theme.colorScheme.secondary, () {
                       Navigator.push(
@@ -233,7 +245,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (_) => const DiagnoseScreen()));
                     }),
                     featureCard('Chatbot', Icons.chat, Colors.blue, () {
-                      Navigator.pushNamed(context, '/chatbot');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatbotScreen(
+                            apiKey: 'ZLx3V2hqtfpEGam9Xx7TLuE7gprpNUIpU71Cghe9',
+                          ),
+                        ),
+                      );
                     }),
                     featureCard('Community', Icons.people, Colors.purple, () {
                       Navigator.push(

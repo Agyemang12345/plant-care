@@ -23,10 +23,11 @@ class GeminiApiService {
           }
         ],
         'generationConfig': {
-          'temperature': 0.4,
-          'topK': 32,
-          'topP': 0.8,
-          'maxOutputTokens': 1024,
+          'temperature': 0.9,
+          'topK': 40,
+          'topP': 0.95,
+          'maxOutputTokens': 2048,
+          'stopSequences': [],
         },
         'safetySettings': [
           {
@@ -48,8 +49,6 @@ class GeminiApiService {
         ]
       };
 
-      print('Request body: ${jsonEncode(requestBody)}');
-
       final response = await http.post(
         url,
         headers: {
@@ -57,9 +56,6 @@ class GeminiApiService {
         },
         body: jsonEncode(requestBody),
       );
-
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         try {
@@ -81,7 +77,13 @@ class GeminiApiService {
             return 'Error: No response parts found';
           }
 
-          return parts[0]['text'] as String;
+          String responseText = parts[0]['text'] as String;
+
+          // Format the response for better readability
+          responseText = responseText.replaceAll('\n\n', '\n');
+          responseText = responseText.trim();
+
+          return responseText;
         } catch (e) {
           print('Error parsing response: $e');
           return 'Error: Failed to parse API response';

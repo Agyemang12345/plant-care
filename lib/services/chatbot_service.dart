@@ -1,11 +1,11 @@
-import 'package:plant_care_app/services/gemini_api_service.dart';
+import 'package:plant_care_app/services/cohere_api_service.dart';
 
 class ChatbotService {
-  final GeminiApiService _geminiService;
+  final CohereApiService _cohereService;
   final List<Map<String, String>> _conversationHistory = [];
 
   ChatbotService({required String apiKey})
-      : _geminiService = GeminiApiService(apiKey: apiKey);
+      : _cohereService = CohereApiService(apiKey: apiKey);
 
   Future<String> sendMessage(String message) async {
     try {
@@ -15,16 +15,9 @@ class ChatbotService {
         'content': message,
       });
 
-      // Prepare the conversation context with plant care focus
-      String context =
-          'You are a knowledgeable plant care assistant. Your role is to help users with plant-related questions, provide care tips, diagnose plant issues, and offer gardening advice. Please be specific and practical in your responses.\n\nConversation history:\n';
-
-      context += _conversationHistory.map((msg) {
-        return "${msg['role'] == 'user' ? 'User' : 'Assistant'}: ${msg['content']}";
-      }).join('\n');
-
-      // Generate response using Gemini API
-      String response = await _geminiService.generateContent(context);
+      // Generate response using Cohere API
+      String response =
+          await _cohereService.generateContent(message, _conversationHistory);
 
       // Add assistant response to conversation history
       _conversationHistory.add({

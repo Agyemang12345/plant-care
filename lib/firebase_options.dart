@@ -32,7 +32,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR-WEB-API-KEY',
+    apiKey: 'AIzaSyA6PHQOnMRAJHBV3kcpZ30oqXZavGpMKo4',
     appId: 'YOUR-WEB-APP-ID',
     messagingSenderId: 'YOUR-SENDER-ID',
     projectId: 'YOUR-PROJECT-ID',
@@ -41,7 +41,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR-ANDROID-API-KEY',
+    apiKey: 'AIzaSyA6PHQOnMRAJHBV3kcpZ30oqXZavGpMKo4',
     appId: 'YOUR-ANDROID-APP-ID',
     messagingSenderId: 'YOUR-SENDER-ID',
     projectId: 'YOUR-PROJECT-ID',
@@ -49,7 +49,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR-IOS-API-KEY',
+    apiKey: 'AIzaSyA6PHQOnMRAJHBV3kcpZ30oqXZavGpMKo4',
     appId: 'YOUR-IOS-APP-ID',
     messagingSenderId: 'YOUR-SENDER-ID',
     projectId: 'YOUR-PROJECT-ID',
@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR-MACOS-API-KEY',
+    apiKey: 'AIzaSyA6PHQOnMRAJHBV3kcpZ30oqXZavGpMKo4',
     appId: 'YOUR-MACOS-APP-ID',
     messagingSenderId: 'YOUR-SENDER-ID',
     projectId: 'YOUR-PROJECT-ID',

@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
               Provider(create: (_) => AuthService()),
               Provider(
                 create: (_) => ChatbotService(
-                  apiKey: 'AIzaSyB1s1nouKZ1AnDEbne9D2J4CvChnRDIeDw',
+                  apiKey: 'ZLx3V2hqtfpEGam9Xx7TLuE7gprpNUIpU71Cghe9',
                 ),
               ),
             ],
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                     '/home': (context) => const HomeScreen(),
                     '/settings': (context) => const SettingsScreen(),
                     '/chatbot': (context) => const ChatbotScreen(
-                        apiKey: 'AIzaSyB1s1nouKZ1AnDEbne9D2J4CvChnRDIeDw'),
+                        apiKey: 'ZLx3V2hqtfpEGam9Xx7TLuE7gprpNUIpU71Cghe9'),
                   },
                 );
               },
