@@ -8,6 +8,7 @@ import 'community_screen.dart';
 import 'weather_screen.dart';
 import 'tip_page.dart';
 import 'plant_identification_screen.dart';
+import 'gemini_plant_scan_screen.dart';
 // import 'settings_screen.dart'; // Uncomment if you have a settings screen
 
 class HomeScreen extends StatefulWidget {

@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class PlantIdentifierService {
-  static const String _apiKey = '2b107qdsw8e2sPkr4S4yrw1eO';
-  static const String _apiUrl =
-      'https://my-api.plantnet.org/v2/identify/all?api-key=$_apiKey';
+  final String _apiKey;
+  static const String _baseUrl = 'https://my-api.plantnet.org/v2/identify/all';
+
+  PlantIdentifierService([String? apiKey])
+      : _apiKey = apiKey ?? '2b107qdsw8e2sPkr4S4yrw1eO';
 
   Future<Map<String, dynamic>> identifyPlant(File imageFile) async {
     try {
@@ -15,7 +17,8 @@ class PlantIdentifierService {
       String base64Image = base64Encode(imageBytes);
 
       // Prepare the request body
-      final request = http.MultipartRequest('POST', Uri.parse(_apiUrl));
+      final request = http.MultipartRequest(
+          'POST', Uri.parse('$_baseUrl?api-key=$_apiKey'));
       request.files.add(http.MultipartFile.fromBytes('images', imageBytes,
           filename: 'plant.jpg'));
       request.fields['organs'] = 'leaf';
@@ -27,19 +30,19 @@ class PlantIdentifierService {
           await request.send().timeout(const Duration(seconds: 20));
       final responseBody = await response.stream.bytesToString();
 
-      print('PlantNet response status: ${response.statusCode}');
-      print('PlantNet response body: $responseBody');
+      print('PlantNet response status: \\${response.statusCode}');
+      print('PlantNet response body: \\${responseBody}');
 
       if (response.statusCode == 200) {
         return json.decode(responseBody);
       } else {
-        print('PlantNet API error: ${response.statusCode}');
-        print('Response body: $responseBody');
-        throw Exception('Failed to identify plant: ${response.statusCode}');
+        print('PlantNet API error: \\${response.statusCode}');
+        print('Response body: \\${responseBody}');
+        throw Exception('Failed to identify plant: \\${response.statusCode}');
       }
     } catch (e) {
-      print('Exception in identifyPlant: $e');
-      throw Exception('Error identifying plant: $e');
+      print('Exception in identifyPlant: \\${e}');
+      throw Exception('Error identifying plant: \\${e}');
     }
   }
 }

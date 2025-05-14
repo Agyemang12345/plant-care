@@ -18,6 +18,7 @@ class _PlantIdentificationScreenState extends State<PlantIdentificationScreen> {
   File? _image;
   bool _isLoading = false;
   Map<String, dynamic>? _result;
+  String? _error;
   late final PlantIdService _plantIdService;
   final ImagePicker _picker = ImagePicker();
 
@@ -29,15 +30,47 @@ class _PlantIdentificationScreenState extends State<PlantIdentificationScreen> {
 
   Future<void> _pickImage() async {
     try {
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.gallery);
+      print('Starting image pick process...');
+      setState(() {
+        _error = null;
+        _result = null;
+      });
+
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1800,
+        maxHeight: 1800,
+        imageQuality: 85,
+      );
+
+      print('Image picker result: ${pickedFile?.path}');
+
       if (pickedFile != null) {
-        setState(() {
-          _image = File(pickedFile.path);
-          _result = null;
-        });
+        final file = File(pickedFile.path);
+        print('Checking if file exists: ${file.path}');
+        print('File exists: ${await file.exists()}');
+
+        if (await file.exists()) {
+          print('File size: ${await file.length()} bytes');
+          setState(() {
+            _image = file;
+          });
+          print('Image set successfully');
+        } else {
+          print('File does not exist after picking');
+          setState(() {
+            _error = 'Failed to load image file';
+          });
+        }
+      } else {
+        print('No image was picked');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error picking image: $e');
+      print('Stack trace: $stackTrace');
+      setState(() {
+        _error = 'Error picking image: $e';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error picking image: $e')),
       );
@@ -45,21 +78,36 @@ class _PlantIdentificationScreenState extends State<PlantIdentificationScreen> {
   }
 
   Future<void> _identifyPlant() async {
-    if (_image == null) return;
+    if (_image == null) {
+      print('No image selected for identification');
+      return;
+    }
+
+    print('Starting plant identification...');
+    print('Image path: ${_image!.path}');
+    print('Image exists: ${await _image!.exists()}');
 
     setState(() {
       _isLoading = true;
+      _error = null;
+      _result = null;
     });
 
     try {
+      print('Calling PlantIdService...');
       final result = await _plantIdService.identifyPlant(_image!);
+      print('Plant identification result received');
       setState(() {
         _result = result;
         _isLoading = false;
       });
-    } catch (e) {
+      print('Result set successfully');
+    } catch (e, stackTrace) {
+      print('Error identifying plant: $e');
+      print('Stack trace: $stackTrace');
       setState(() {
         _isLoading = false;
+        _error = e.toString();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error identifying plant: $e')),
@@ -78,6 +126,19 @@ class _PlantIdentificationScreenState extends State<PlantIdentificationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_error != null)
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                margin: const EdgeInsets.only(bottom: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Colors.red.shade900),
+                ),
+              ),
             if (_image != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
@@ -105,12 +166,12 @@ class _PlantIdentificationScreenState extends State<PlantIdentificationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Plant Name: ${_result!['result']['plant']['name']}',
+                        'Plant Name: ${_result!['result']['plant']['name'] ?? 'Unknown'}',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Scientific Name: ${_result!['result']['plant']['scientific_name']}',
+                        'Scientific Name: ${_result!['result']['plant']['scientific_name'] ?? 'Unknown'}',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),

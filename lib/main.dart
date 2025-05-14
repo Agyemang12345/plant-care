@@ -12,6 +12,8 @@ import 'screens/register_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/chatbot_screen.dart';
+import 'screens/plant_identification_screen.dart';
+import 'screens/perenual_scan_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +58,11 @@ class MyApp extends StatelessWidget {
                     '/settings': (context) => const SettingsScreen(),
                     '/chatbot': (context) => const ChatbotScreen(
                         apiKey: 'ZLx3V2hqtfpEGam9Xx7TLuE7gprpNUIpU71Cghe9'),
+                    '/plant-identification': (context) =>
+                        const PlantIdentificationScreen(
+                            apiKey:
+                                'bpi8s6TqluSesjZ1oHmG15gFRVPGISDyR6gl94jqmkMgR1UnDx'),
+                    '/perenual-scan': (context) => const PerenualScanScreen(),
                   },
                 );
               },

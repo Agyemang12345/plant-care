@@ -4,62 +4,46 @@ import 'dart:math';
 class MockPlantIdentifierService {
   final List<Map<String, dynamic>> _mockPlants = [
     {
-      'commonName': 'Snake Plant',
-      'scientificName': 'Sansevieria trifasciata',
-      'description':
-          'The snake plant is one of the most popular and hardy houseplants. It features stiff, sword-like leaves and can grow anywhere from 6 inches to several feet tall.',
-      'watering':
-          'Water every 2-3 weeks, allowing soil to dry out between waterings. Water even less during winter.',
-      'sunlight': 'Can tolerate low light but thrives in bright indirect light',
-      'propagation': 'Division, leaf cuttings in water or soil',
-      'confidence': 0.95,
+      'commonName': 'Mango Plant',
+      'scientificName': 'Mangifera indica',
+      'defaultMessage': '''This is a mango plant.
+
+Mango plants (Mangifera indica) are tropical fruit trees that thrive in warm, sunny climates. To care for a mango plant in a garden:
+- Plant in well-draining, fertile soil with full sun exposure.
+- Water deeply but infrequently, allowing the soil to dry slightly between waterings.
+- Fertilize with a balanced fertilizer during the growing season.
+- Prune to remove dead or diseased branches and to shape the tree.
+- Protect young plants from frost and strong winds.
+Mango trees can grow large, so give them plenty of space!'''
     },
     {
-      'commonName': 'Peace Lily',
-      'scientificName': 'Spathiphyllum wallisii',
-      'description':
-          'Peace lilies are tropical, evergreen plants that thrive on the forest floor, where they receive dappled sunlight and consistent moisture.',
-      'watering':
-          'Keep soil moist but not waterlogged. Water when top inch of soil feels dry.',
-      'sunlight': 'Medium to low indirect light',
-      'propagation': 'Division of clumps during repotting',
-      'confidence': 0.92,
+      'commonName': 'Grass',
+      'scientificName': 'Poaceae',
+      'defaultMessage': '''This is a grass plant.
+
+Grasses (family Poaceae) are among the most widespread and important plants on earth. For garden care:
+- Most grasses prefer full sun and well-drained soil.
+- Water regularly, especially during dry periods, but avoid waterlogging.
+- Mow or trim as needed to maintain desired height.
+- Fertilize in spring and fall for lush growth.
+Grasses help prevent soil erosion and provide habitat for many creatures.'''
     },
     {
-      'commonName': 'Spider Plant',
-      'scientificName': 'Chlorophytum comosum',
-      'description':
-          'Spider plants are easy-to-grow houseplants that produce arching clumps of grass-like leaves and lots of baby plantlets on long stems.',
-      'watering':
-          'Water when the top 50% of soil is dry. Typically every 7-10 days.',
-      'sunlight': 'Bright indirect light to partial shade',
-      'propagation':
-          'Plantlets can be rooted while still attached to the mother plant',
-      'confidence': 0.89,
+      'commonName': 'Orange Plant',
+      'scientificName': 'Citrus sinensis',
+      'defaultMessage': '''This is an orange plant.
+
+Orange plants (Citrus sinensis) are evergreen fruit trees. There are many species and varieties, including navel, Valencia, and blood oranges. For best results:
+- Plant in well-drained, sandy loam soil with full sun.
+- Water regularly but do not overwater; allow the top inch of soil to dry out between waterings.
+- Fertilize with a citrus-specific fertilizer during the growing season.
+- Prune to remove dead wood and improve air circulation.
+- Protect from frost and pests like aphids and scale insects.
+Oranges are rich in vitamin C and are enjoyed worldwide!'''
     },
-    {
-      'commonName': 'Monstera',
-      'scientificName': 'Monstera deliciosa',
-      'description':
-          'Known for its distinctive leaves with natural holes, the Monstera is a striking tropical plant that makes a bold statement in any space.',
-      'watering':
-          'Water every 1-2 weeks, allowing soil to dry out between waterings.',
-      'sunlight': 'Bright indirect light',
-      'propagation': 'Stem cuttings in water or soil',
-      'confidence': 0.94,
-    },
-    {
-      'commonName': 'ZZ Plant',
-      'scientificName': 'Zamioculcas zamiifolia',
-      'description':
-          'The ZZ Plant is a tropical plant known for its thick, waxy leaves and tolerance of low light conditions.',
-      'watering':
-          'Allow soil to dry completely between waterings. Water every 2-3 weeks.',
-      'sunlight': 'Can tolerate low light to bright indirect light',
-      'propagation': 'Division or leaf cuttings',
-      'confidence': 0.91,
-    }
   ];
+
+  List<Map<String, dynamic>> get mockPlants => _mockPlants;
 
   Future<Map<String, dynamic>> identifyPlant(File imageFile) async {
     // Simulate network delay
@@ -73,14 +57,11 @@ class MockPlantIdentifierService {
       'suggestions': [
         {
           'plant_details': {
-            'common_names': [mockPlant['commonName']],
+            'common_name': mockPlant['commonName'],
             'scientific_name': mockPlant['scientificName'],
-            'wiki_description': {'value': mockPlant['description']},
-            'watering': {'description': mockPlant['watering']},
-            'sunlight': [mockPlant['sunlight']],
-            'propagation': [mockPlant['propagation']]
+            'default_message': mockPlant['defaultMessage'],
           },
-          'probability': mockPlant['confidence']
+          'probability': 0.95
         }
       ]
     };

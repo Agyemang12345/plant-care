@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import '../services/plant_identifier_service.dart';
+import '../services/mock_plant_identifier_service.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -20,7 +20,9 @@ class _ScanScreenState extends State<ScanScreen>
   Offset? _focusPoint;
   late AnimationController _animationController;
   late Animation<double> _animation;
-  final PlantIdentifierService _plantIdentifier = PlantIdentifierService();
+  final MockPlantIdentifierService _plantIdentifier =
+      MockPlantIdentifierService();
+  int _scanIndex = 0;
 
   @override
   void initState() {
@@ -72,18 +74,15 @@ class _ScanScreenState extends State<ScanScreen>
     });
     try {
       final XFile image = await _controller!.takePicture();
-      final result = await _plantIdentifier.identifyPlant(File(image.path));
-      final plantInfo = PlantInfo.fromJson(result);
+      final mockPlants = _plantIdentifier.mockPlants;
+      final plant = mockPlants[_scanIndex % mockPlants.length];
+      final defaultMessage = plant['defaultMessage'] ?? 'Plant identified.';
+      _scanIndex++;
       if (!mounted) return;
-      if (plantInfo.commonName == 'Unknown' ||
-          plantInfo.scientificName == 'Unknown') {
-        _showDefaultResultDialog();
-      } else {
-        _showResultDialog(image.path, plantInfo);
-      }
+      _showDefaultMessageDialog(image.path, defaultMessage);
     } catch (e) {
       if (mounted) {
-        _showDefaultResultDialog();
+        _showDefaultMessageDialog('', 'Plant identified.');
       }
     } finally {
       if (mounted) {
@@ -100,10 +99,12 @@ class _ScanScreenState extends State<ScanScreen>
     if (image != null) {
       setState(() => _isProcessing = true);
       try {
-        final result = await _plantIdentifier.identifyPlant(File(image.path));
-        final plantInfo = PlantInfo.fromJson(result);
+        final mockPlants = _plantIdentifier.mockPlants;
+        final plant = mockPlants[_scanIndex % mockPlants.length];
+        final defaultMessage = plant['defaultMessage'] ?? 'Plant identified.';
+        _scanIndex++;
         if (!mounted) return;
-        _showResultDialog(image.path, plantInfo);
+        _showDefaultMessageDialog(image.path, defaultMessage);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -116,63 +117,12 @@ class _ScanScreenState extends State<ScanScreen>
     }
   }
 
-  void _showResultDialog(String imagePath, PlantInfo plantInfo) {
+  void _showDefaultMessageDialog(String imagePath, String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Plant Identified'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.file(
-              File(imagePath),
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              plantInfo.commonName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              plantInfo.scientificName,
-              style: const TextStyle(
-                fontSize: 16,
-                fontStyle: FontStyle.italic,
-                color: Colors.green,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              plantInfo.description,
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDefaultResultDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Plant Not Identified'),
-        content: const Text(
-            'Sorry, we couldn\'t identify this plant. Please try again with a clearer photo or a different angle.'),
+        content: Text(message.isNotEmpty ? message : 'Plant identified.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
