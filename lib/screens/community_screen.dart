@@ -24,10 +24,20 @@ class _CommunityScreenState extends State<CommunityScreen>
     'assets/images/avatars/emma.jpg',
   ];
 
+  // Store posts in state
+  late List<CommunityPost> _posts;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _posts = _communityService.getPosts();
+  }
+
+  void _addPost(CommunityPost post) {
+    setState(() {
+      _posts.insert(0, post); // Add new post to the top
+    });
   }
 
   @override
@@ -64,11 +74,18 @@ class _CommunityScreenState extends State<CommunityScreen>
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final newPost = await Navigator.push<CommunityPost>(
             context,
-            MaterialPageRoute(builder: (_) => const CreatePostPage()),
+            MaterialPageRoute(
+              builder: (_) => CreatePostPage(
+                onCreate: (post) => Navigator.pop(context, post),
+              ),
+            ),
           );
+          if (newPost != null) {
+            _addPost(newPost);
+          }
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),
@@ -77,12 +94,11 @@ class _CommunityScreenState extends State<CommunityScreen>
   }
 
   Widget _buildPostsTab() {
-    final posts = _communityService.getPosts();
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: posts.length,
+      itemCount: _posts.length,
       itemBuilder: (context, index) {
-        final post = posts[index];
+        final post = _posts[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
           child: Column(
@@ -370,10 +386,14 @@ class _CommunityScreenState extends State<CommunityScreen>
 }
 
 class CreatePostPage extends StatelessWidget {
-  const CreatePostPage({super.key});
+  const CreatePostPage({super.key, required this.onCreate});
+
+  final Function(CommunityPost) onCreate;
 
   @override
   Widget build(BuildContext context) {
+    final titleController = TextEditingController();
+    final contentController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Post'),
@@ -384,15 +404,17 @@ class CreatePostPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
                 labelText: 'Title',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: contentController,
+              decoration: const InputDecoration(
                 labelText: 'Content',
                 border: OutlineInputBorder(),
               ),
@@ -401,8 +423,19 @@ class CreatePostPage extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // TODO: Implement post creation logic
-                Navigator.pop(context);
+                final post = CommunityPost(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  authorName: 'You',
+                  authorAvatar: '',
+                  content: contentController.text,
+                  imageUrl: null,
+                  timestamp: DateTime.now(),
+                  tags: [],
+                  likes: 0,
+                  comments: 0,
+                  authorExpertise: '',
+                );
+                onCreate(post);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
