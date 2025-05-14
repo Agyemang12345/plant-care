@@ -214,23 +214,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    featureCard(
-                      'Plant Identification',
-                      Icons.camera_alt,
-                      Colors.green,
-                      () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const PlantIdentificationScreen(
-                              apiKey:
-                                  'YOUR_API_KEY', // Replace with your actual API key
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 12),
                     featureCard('Plant Identifier', Icons.spa,
                         theme.colorScheme.secondary, () {
                       Navigator.push(
@@ -359,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: const CircleBorder(),
         child: const Icon(Icons.qr_code_scanner, size: 32, color: Colors.white),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: _buildBottomNavBar(theme),
     );
   }

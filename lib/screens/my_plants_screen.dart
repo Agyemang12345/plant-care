@@ -20,6 +20,11 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
       MockPlantIdentifierService();
   bool _isLoading = false;
 
+  // State for garden, reminders, and history
+  final List<PlantInfo> _gardenPlants = [];
+  final List<String> _reminders = [];
+  final List<String> _history = [];
+
   @override
   void initState() {
     super.initState();
@@ -128,7 +133,7 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
     }
   }
 
-  Future<void> _showPlantInfoDialog(PlantInfo plantInfo) {
+  Future<void> _showPlantInfoDialog(PlantInfo plantInfo) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -175,9 +180,22 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Add plant to user's garden
+                      onPressed: () async {
+                        setState(() {
+                          _gardenPlants.add(plantInfo);
+                          _history
+                              .add('Added ${plantInfo.commonName} to garden');
+                        });
                         Navigator.pop(context);
+                        // Prompt for reminder
+                        final reminder =
+                            await _showReminderDialog(plantInfo.commonName);
+                        if (reminder != null && reminder.isNotEmpty) {
+                          setState(() {
+                            _reminders.add(
+                                'Reminder for ${plantInfo.commonName}: $reminder');
+                          });
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1B4332),
@@ -201,6 +219,31 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
           ),
         );
       },
+    );
+  }
+
+  Future<String?> _showReminderDialog(String plantName) async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Set Reminder for $plantName'),
+        content: TextField(
+          controller: controller,
+          decoration:
+              const InputDecoration(hintText: 'e.g. Water every 3 days'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -228,6 +271,89 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGardenTab() {
+    if (_gardenPlants.isEmpty) {
+      return _buildEmptyState();
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _gardenPlants.length,
+      itemBuilder: (context, index) {
+        final plant = _gardenPlants[index];
+        return Card(
+          child: ListTile(
+            leading: const Icon(Icons.local_florist, color: Colors.green),
+            title: Text(plant.commonName),
+            subtitle: Text(plant.scientificName),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRemindersTab() {
+    if (_reminders.isEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.notifications_none,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No Reminders',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1B4332),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Add plants to set care reminders',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _reminders.length,
+      itemBuilder: (context, index) {
+        return Card(
+          child: ListTile(
+            leading:
+                const Icon(Icons.notifications_active, color: Colors.orange),
+            title: Text(_reminders[index]),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHistoryTab() {
+    if (_history.isEmpty) {
+      return const Center(child: Text('History will appear here'));
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _history.length,
+      itemBuilder: (context, index) {
+        return Card(
+          child: ListTile(
+            leading: const Icon(Icons.history, color: Colors.blueGrey),
+            title: Text(_history[index]),
+          ),
+        );
+      },
     );
   }
 
@@ -283,11 +409,11 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
                 controller: _tabController,
                 children: [
                   // Garden Tab
-                  _buildEmptyState(),
+                  _buildGardenTab(),
                   // Reminders Tab
                   _buildRemindersTab(),
                   // History Tab
-                  const Center(child: Text('History will appear here')),
+                  _buildHistoryTab(),
                 ],
               ),
             ),
@@ -379,36 +505,6 @@ class _MyPlantsScreenState extends State<MyPlantsScreen>
                 ),
               ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRemindersTab() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.notifications_none,
-          size: 64,
-          color: Colors.grey[400],
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'No Reminders',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1B4332),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Add plants to set care reminders',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
           ),
         ),
       ],

@@ -18,11 +18,23 @@ class PlantInfo {
   });
 
   factory PlantInfo.fromJson(Map<String, dynamic> json) {
-    final suggestion = json['suggestions'][0];
-    final plantDetails = suggestion['plant_details'];
+    final suggestions = json['suggestions'] as List?;
+    if (suggestions == null || suggestions.isEmpty) {
+      return PlantInfo(
+        commonName: 'Unknown',
+        scientificName: 'Unknown',
+        description: 'No description available',
+        watering: 'Information not available',
+        sunlight: 'Information not available',
+        propagation: 'Information not available',
+        confidence: 0.0,
+      );
+    }
+    final suggestion = suggestions[0];
+    final plantDetails = suggestion['plant_details'] ?? {};
 
     return PlantInfo(
-      commonName: (plantDetails['common_names'] as List).first ?? 'Unknown',
+      commonName: (plantDetails['common_names'] as List?)?.first ?? 'Unknown',
       scientificName: plantDetails['scientific_name'] ?? 'Unknown',
       description: plantDetails['wiki_description']?['value'] ??
           'No description available',

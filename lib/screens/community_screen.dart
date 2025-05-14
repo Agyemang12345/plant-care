@@ -26,6 +26,8 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   // Store posts in state
   late List<CommunityPost> _posts;
+  // Store comments in memory, keyed by post ID
+  final Map<String, List<String>> _comments = {};
 
   @override
   void initState() {
@@ -38,6 +40,72 @@ class _CommunityScreenState extends State<CommunityScreen>
     setState(() {
       _posts.insert(0, post); // Add new post to the top
     });
+  }
+
+  void _showCommentsDialog(BuildContext context, int postIndex) {
+    final post = _posts[postIndex];
+    final postComments = _comments[post.id] ?? [];
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Comments'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: postComments.isEmpty
+                        ? [const Text('No comments yet.')]
+                        : postComments
+                            .map((c) => ListTile(title: Text(c)))
+                            .toList(),
+                  ),
+                ),
+                TextField(
+                  controller: commentController,
+                  decoration: const InputDecoration(hintText: 'Add a comment'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final text = commentController.text.trim();
+                if (text.isNotEmpty) {
+                  setState(() {
+                    _comments[post.id] = List.from(postComments)..add(text);
+                    _posts[postIndex] = CommunityPost(
+                      id: post.id,
+                      authorName: post.authorName,
+                      authorAvatar: post.authorAvatar,
+                      content: post.content,
+                      imageUrl: post.imageUrl,
+                      timestamp: post.timestamp,
+                      tags: post.tags,
+                      likes: post.likes,
+                      comments: post.comments + 1,
+                      authorExpertise: post.authorExpertise,
+                    );
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Post'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -146,12 +214,29 @@ class _CommunityScreenState extends State<CommunityScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _posts[index] = CommunityPost(
+                          id: post.id,
+                          authorName: post.authorName,
+                          authorAvatar: post.authorAvatar,
+                          content: post.content,
+                          imageUrl: post.imageUrl,
+                          timestamp: post.timestamp,
+                          tags: post.tags,
+                          likes: post.likes + 1,
+                          comments: post.comments,
+                          authorExpertise: post.authorExpertise,
+                        );
+                      });
+                    },
                     icon: const Icon(Icons.favorite_border),
                     label: Text('${post.likes}'),
                   ),
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showCommentsDialog(context, index);
+                    },
                     icon: const Icon(Icons.comment_outlined),
                     label: Text('${post.comments}'),
                   ),
